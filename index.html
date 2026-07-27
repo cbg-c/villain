@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blind Rank: Top 100 Villains</title>
+    <style>
+        :root {
+            --bg-color: #1a1a24;
+            --card-bg: #2d2d3f;
+            --accent: #ff4757;
+            --accent-hover: #ff6b81;
+            --text-main: #ffffff;
+            --text-sub: #a4b0be;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: var(--text-sub);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        #game-board {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #current-villain-card {
+            background: var(--card-bg);
+            padding: 30px 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 2px solid var(--accent);
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 20px rgba(255, 71, 87, 0.15);
+        }
+
+        #villain-name {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        #villain-origin {
+            margin: 10px 0 0 0;
+            color: var(--text-sub);
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+        }
+
+        .slot {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            margin-bottom: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            height: 60px;
+            border: 1px solid transparent;
+        }
+
+        .slot:hover:not(.filled) {
+            border-color: var(--accent);
+            background: #3a3a52;
+            transform: translateX(5px);
+        }
+
+        .slot.filled {
+            background: var(--accent);
+            cursor: default;
+            color: white;
+        }
+
+        .rank-num {
+            font-size: 1.4rem;
+            font-weight: bold;
+            width: 50px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .slot-content {
+            padding-left: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Blind Rank</h1>
+    <p class="subtitle">Top 100 Villains in Pop Culture (Movies, TV, Games)</p>
+
+    <div id="game-board">
+        <div id="current-villain-card">
+            <h2 id="villain-name" class="hidden"></h2>
+            <p id="villain-origin" class="hidden"></p>
+            <button id="start-btn">Start Game</button>
+        </div>
+
+        <div id="rank-list">
+            <!-- JavaScript will populate slots 1 to 10 here -->
+        </div>
+    </div>
+
+    <script>
+        // The Top 100 Villains Database
+        const villainsDatabase = [
+            { name: "Darth Vader", origin: "Star Wars" },
+            { name: "The Joker", origin: "DC Comics / Batman" },
+            { name: "Hannibal Lecter", origin: "The Silence of the Lambs" },
+            { name: "Lord Voldemort", origin: "Harry Potter" },
+            { name: "Sauron", origin: "The Lord of the Rings" },
+            { name: "Norman Bates", origin: "Psycho" },
+            { name: "Hans Gruber", origin: "Die Hard" },
+            { name: "Anton Chigurh", origin: "No Country for Old Men" },
+            { name: "Thanos", origin: "Marvel Cinematic Universe" },
+            { name: "Emperor Palpatine", origin: "Star Wars" },
+            { name: "Magneto", origin: "X-Men" },
+            { name: "Lex Luthor", origin: "Superman" },
+            { name: "Nurse Ratched", origin: "One Flew Over the Cuckoo's Nest" },
+            { name: "HAL 9000", origin: "2001: A Space Odyssey" },
+            { name: "Wicked Witch of the West", origin: "The Wizard of Oz" },
+            { name: "Michael Myers", origin: "Halloween" },
+            { name: "Freddy Krueger", origin: "A Nightmare on Elm Street" },
+            { name: "Jason Voorhees", origin: "Friday the 13th" },
+            { name: "T-800 Terminator", origin: "The Terminator" },
+            { name: "T-1000", origin: "Terminator 2: Judgment Day" },
+            { name: "Agent Smith", origin: "The Matrix" },
+            { name: "Gollum", origin: "The Lord of the Rings" },
+            { name: "Amon Goeth", origin: "Schindler's List" },
+            { name: "Scar", origin: "The Lion King" },
+            { name: "Cruella de Vil", origin: "101 Dalmatians" },
+            { name: "Joffrey Baratheon", origin: "Game of Thrones" },
+            { name: "Ramsay Bolton", origin: "Game of Thrones" },
+            { name: "Cersei Lannister", origin: "Game of Thrones" },
+            { name: "Tywin Lannister", origin: "Game of Thrones" },
+            { name: "Night King", origin: "Game of Thrones" },
+            { name: "Homelander", origin: "The Boys" },
+            { name: "Gus Fring", origin: "Breaking Bad" },
+            { name: "Walter White", origin: "Breaking Bad" },
+            { name: "Negan", origin: "The Walking Dead" },
+            { name: "Sephiroth", origin: "Final Fantasy VII" },
+            { name: "Bowser", origin: "Super Mario Bros." },
+            { name: "Ganondorf", origin: "The Legend of Zelda" },
+            { name: "Albert Wesker", origin: "Resident Evil" },
+            { name: "GLaDOS", origin: "Portal" },
+            { name: "Handsome Jack", origin: "Borderlands 2" },
+            { name: "Dr. Eggman / Robotnik", origin: "Sonic the Hedgehog" },
+            { name: "Dracula", origin: "Castlevania / Universal" },
+            { name: "Shao Kahn", origin: "Mortal Kombat" },
+            { name: "M. Bison", origin: "Street Fighter" },
+            { name: "The Lich King (Arthas)", origin: "World of Warcraft" },
+            { name: "Vaas Montenegro", origin: "Far Cry 3" },
+            { name: "Dutch van der Linde", origin: "Red Dead Redemption 2" },
+            { name: "Andrew Ryan", origin: "BioShock" },
+            { name: "Frank Fontaine", origin: "BioShock" },
+            { name: "Alma Wade", origin: "F.E.A.R." },
+            { name: "Nemesis", origin: "Resident Evil 3" },
+            { name: "Pyramid Head", origin: "Silent Hill 2" },
+            { name: "Ridley", origin: "Metroid" },
+            { name: "King K. Rool", origin: "Donkey Kong Country" },
+            { name: "Micah Bell", origin: "Red Dead Redemption 2" },
+            { name: "Liquid Snake", origin: "Metal Gear Solid" },
+            { name: "Revolver Ocelot", origin: "Metal Gear Solid" },
+            { name: "Master Hand", origin: "Super Smash Bros." },
+            { name: "The Illusive Man", origin: "Mass Effect" },
+            { name: "Saren Arterius", origin: "Mass Effect" },
+            { name: "SHODAN", origin: "System Shock" },
+            { name: "Eredin", origin: "The Witcher 3: Wild Hunt" },
+            { name: "Gaunter O'Dimm", origin: "The Witcher 3: Hearts of Stone" },
+            { name: "Maleficent", origin: "Sleeping Beauty" },
+            { name: "Ursula", origin: "The Little Mermaid" },
+            { name: "Jafar", origin: "Aladdin" },
+            { name: "Hades", origin: "Hercules" },
+            { name: "Gaston", origin: "Beauty and the Beast" },
+            { name: "Claude Frollo", origin: "The Hunchback of Notre Dame" },
+            { name: "Captain Hook", origin: "Peter Pan" },
+            { name: "The Evil Queen", origin: "Snow White" },
+            { name: "Yzma", origin: "The Emperor's New Groove" },
+            { name: "Bellatrix Lestrange", origin: "Harry Potter" },
+            { name: "Dolores Umbridge", origin: "Harry Potter" },
+            { name: "Kylo Ren", origin: "Star Wars" },
+            { name: "General Grievous", origin: "Star Wars" },
+            { name: "Count Dooku", origin: "Star Wars" },
+            { name: "Boba Fett", origin: "Star Wars" },
+            { name: "Green Goblin", origin: "Spider-Man" },
+            { name: "Doctor Octopus", origin: "Spider-Man" },
+            { name: "Venom", origin: "Spider-Man" },
+            { name: "Loki", origin: "Marvel Cinematic Universe" },
+            { name: "Killmonger", origin: "Black Panther" },
+            { name: "Hela", origin: "Thor: Ragnarok" },
+            { name: "Ultron", origin: "Avengers: Age of Ultron" },
+            { name: "Red Skull", origin: "Captain America" },
+            { name: "Kingpin", origin: "Daredevil" },
+            { name: "Bane", origin: "Batman" },
+            { name: "Ra's al Ghul", origin: "Batman" },
+            { name: "Scarecrow", origin: "Batman" },
+            { name: "Two-Face", origin: "Batman" },
+            { name: "The Riddler", origin: "Batman" },
+            { name: "The Penguin", origin: "Batman" },
+            { name: "Harley Quinn", origin: "DC Comics" },
+            { name: "Darkseid", origin: "DC Comics" },
+            { name: "Reverse-Flash", origin: "The Flash" },
+            { name: "Deathstroke", origin: "DC Comics" },
+            { name: "General Zod", origin: "Superman" },
+            { name: "Omni-Man", origin: "Invincible" },
+            { name: "Pennywise", origin: "IT" }
+        ];
+
+        let availableVillains = [...villainsDatabase];
+        let currentVillain = null;
+        let slotsFilled = 0;
+
+        // Initialize the 10 UI slots
+        const rankList = document.getElementById('rank-list');
+        for (let i = 1; i <= 10; i++) {
+            const slot = document.createElement('div');
+            slot.className = 'slot';
+            slot.dataset.index = i;
+            
+            const num = document.createElement('span');
+            num.className = 'rank-num';
+            num.innerText = i;
+            
+            const content = document.createElement('span');
+            content.className = 'slot-content';
+            
+            slot.appendChild(num);
+            slot.appendChild(content);
+            rankList.appendChild(slot);
+        }
+
+        // Logic to draw a random villain
+        function rollVillain() {
+            if (slotsFilled >= 10) return; 
+
+            const randIndex = Math.floor(Math.random() * availableVillains.length);
+            currentVillain = availableVillains[randIndex];
+            
+            // Remove them from the pool so we don't get duplicates
+            availableVillains.splice(randIndex, 1);
+            
+            document.getElementById('villain-name').innerText = currentVillain.name;
+            document.getElementById('villain-origin').innerText = currentVillain.origin;
+        }
+
+        // Handle clicking on a slot
+        document.querySelectorAll('.slot').forEach(slot => {
+            slot.addEventListener('click', () => {
+                if (!currentVillain) return; // Ignore if no villain is rolled
+                if (slot.classList.contains('filled')) return; // Ignore if slot is taken
+                
+                // Set the slot text
+                slot.querySelector('.slot-content').innerText = `${currentVillain.name} - (${currentVillain.origin})`;
+                slot.classList.add('filled');
+                
+                currentVillain = null;
+                slotsFilled++;
+                
+                if (slotsFilled < 10) {
+                    rollVillain();
+                } else {
+                    // Game Over state
+                    document.getElementById('villain-name').innerText = "List Complete!";
+                    document.getElementById('villain-origin').innerText = "Here is your final blind ranking.";
+                }
+            });
+        });
+
+        // Start button logic
+        document.getElementById('start-btn').addEventListener('click', (e) => {
+            e.target.classList.add('hidden');
+            document.getElementById('villain-name').classList.remove('hidden');
+            document.getElementById('villain-origin').classList.remove('hidden');
+            rollVillain();
+        });
+    </script>
+</body>
+</html>
