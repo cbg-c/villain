@@ -10,6 +10,8 @@ h1{color:var(--ac);text-transform:uppercase;letter-spacing:2px;text-align:center
 .is-rolling{animation:shake .3s infinite}.is-rolling #villain-img{border-color:#fff!important}
 @keyframes shake{0%,100%{transform:translateY(0)}25%{transform:translateY(-2px)}75%{transform:translateY(2px)}}
 #villain-img{width:400px;height:400px;max-width:100%;border-radius:12px;object-fit:contain;border:3px solid var(--ac);margin-bottom:5px;background:var(--bg);box-shadow:0 8px 20px rgba(255,71,87,.2)}
+#preview-tileset{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:15px;max-width:320px}
+.preview-tile{width:50px;height:50px;border-radius:8px;object-fit:cover;border:2px solid var(--ac);background:var(--bg)}
 #villain-name{margin:0;font-size:1.8rem;font-weight:800}#villain-origin{margin:2px 0 15px;color:var(--ts);font-style:italic;font-size:1rem}
 button{background:var(--ac);color:#fff;border:none;padding:12px 30px;font-size:1.2rem;font-weight:700;border-radius:8px;cursor:pointer;transition:all .2s;text-transform:uppercase}
 button:hover{background:var(--ach);transform:scale(1.05)}
@@ -25,7 +27,7 @@ button:hover{background:var(--ach);transform:scale(1.05)}
 <body><h1>Which villains can you fend off from attacking me?</h1><p class="subtitle"></p>
 <div id="game-board" class="slots-locked"><div id="roller">
 <img id="villain-img" class="hidden" src="" alt="Villain" onerror="usePlaceholder(this)">
-<div id="current-villain-card"><h2 id="villain-name" class="hidden"></h2><p id="villain-origin" class="hidden"></p>
+<div id="current-villain-card"><div id="preview-tileset"></div><h2 id="villain-name" class="hidden"></h2><p id="villain-origin" class="hidden"></p>
 <button id="start-btn">Start Game</button><button id="restart-btn" class="hidden">Start Over</button></div></div><div id="rank-list"></div></div>
 <script>
 const rawVillains=[
@@ -44,15 +46,16 @@ const rawVillains=[
 {name:"General Grievous",origin:"Star Wars",image:"images/general_grievous.jpg"},{name:"Green Goblin",origin:"Spider-Man",image:"images/green_goblin.jpg"},{name:"Doctor Octopus",origin:"Spider-Man",image:"images/doctor_octopus.jpg"},
 {name:"Venom",origin:"Spider-Man",image:"images/venom.jpg"},{name:"Loki",origin:"Marvel Cinematic Universe",image:"images/loki.jpg"},{name:"Hela",origin:"Thor: Ragnarok",image:"images/hela.jpg"},{name:"Bane",origin:"Batman",image:"images/bane.jpg"},{name:"Pennywise",origin:"IT",image:"images/pennywise.jpg"}];
 let availableVillains=[...rawVillains],currentVillain=null,slotsFilled=0,isRolling=!1;
-const rankList=document.getElementById("rank-list"),gameBoard=document.getElementById("game-board"),villainImg=document.getElementById("villain-img");
+const rankList=document.getElementById("rank-list"),gameBoard=document.getElementById("game-board"),villainImg=document.getElementById("villain-img"),tileset=document.getElementById("preview-tileset");
+[...rawVillains].sort(()=>.5-Math.random()).slice(0,5).forEach(e=>{let t=document.createElement("img");t.src=e.image,t.className="preview-tile",t.onerror=()=>usePlaceholder(t,e.name),tileset.appendChild(t)});
 for(let e=1;e<=10;e++){const t=document.createElement("div");t.className="slot-wrapper";const n=document.createElement("div");n.className="slot",n.dataset.index=e;
 const l=document.createElement("span");l.className="rank-num",l.innerText=e;const i=document.createElement("span");i.className="slot-content",n.appendChild(l),n.appendChild(i),t.appendChild(n);
 if(1===e){const e=document.createElement("span");e.className="faint-label",e.innerText="ezpz";e.style.top="-20px",e.style.left="5px",t.appendChild(e)}
 if(10===e){const e=document.createElement("span");e.className="faint-label",e.innerText="we're FUCKED";e.style.bottom="-20px",e.style.right="5px",t.appendChild(e)}rankList.appendChild(t)}
-function usePlaceholder(e){const t=currentVillain?currentVillain.name:"V";e.src=`https://ui-avatars.com/api/?name=${encodeURIComponent(t)}&background=2d2d3f&color=ff4757&size=150&bold=true`}
+function usePlaceholder(e,t){const n=t||(currentVillain?currentVillain.name:"V");e.src=`https://ui-avatars.com/api/?name=${encodeURIComponent(n)}&background=2d2d3f&color=ff4757&size=150&bold=true`}
 function updateCardUI(e){document.getElementById("villain-name").innerText=e.name;document.getElementById("villain-origin").innerText=e.origin,villainImg.src=e.image}
 function animateRoll(e){isRolling=!0,gameBoard.classList.add("slots-locked"),document.getElementById("roller").classList.add("is-rolling");let t=0,n=80;
-!function l(){updateCardUI(rawVillains[Math.floor(Math.random()*rawVillains.length)]),t++,t<10?setTimeout(l,n):t<18?(n+=40,setTimeout(l,n)):(document.getElementById("roller").classList.remove("is-rolling"),e())}()}
+!function l(){updateCardUI(availableVillains[Math.floor(Math.random()*availableVillains.length)]),t++,t<10?setTimeout(l,n):t<18?(n+=40,setTimeout(l,n)):(document.getElementById("roller").classList.remove("is-rolling"),e())}()}
 function drawFinalVillain(){const e=Math.floor(Math.random()*availableVillains.length);currentVillain=availableVillains[e],availableVillains.splice(e,1);
 updateCardUI(currentVillain);isRolling=!1,gameBoard.classList.remove("slots-locked")}
 function triggerNewVillain(){slotsFilled>=10||(currentVillain=null,animateRoll(drawFinalVillain))}
@@ -60,7 +63,7 @@ document.querySelectorAll(".slot").forEach((e=>{e.addEventListener("click",(()=>
 e.querySelector(".slot-content").innerText=`${currentVillain.name} (${currentVillain.origin})`,e.classList.add("filled");
 slotsFilled++,slotsFilled<10?triggerNewVillain():(villainImg.classList.add("hidden"),document.getElementById("villain-name").innerText="List Complete!",
 document.getElementById("villain-origin").innerText="",document.getElementById("restart-btn").classList.remove("hidden"))}))}));
-document.getElementById("start-btn").addEventListener("click",(e=>{e.target.classList.add("hidden"),villainImg.classList.remove("hidden");
+document.getElementById("start-btn").addEventListener("click",(e=>{e.target.classList.add("hidden"),tileset.classList.add("hidden"),villainImg.classList.remove("hidden");
 document.getElementById("villain-name").classList.remove("hidden"),document.getElementById("villain-origin").classList.remove("hidden");triggerNewVillain()}));
 document.getElementById("restart-btn").addEventListener("click",(e=>{e.target.classList.add("hidden"),villainImg.classList.remove("hidden");
 slotsFilled=0,availableVillains=[...rawVillains];document.querySelectorAll(".slot").forEach(s=>{s.classList.remove("filled"),s.querySelector(".slot-content").innerText=""});
