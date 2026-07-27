@@ -51,25 +51,50 @@
             text-align: center;
             margin-bottom: 30px;
             border: 2px solid var(--accent);
-            min-height: 100px;
+            min-height: 250px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             box-shadow: 0 8px 20px rgba(255, 71, 87, 0.15);
+            transition: transform 0.1s ease;
+        }
+
+        /* Animation class for the card while rolling */
+        .is-rolling {
+            animation: shake 0.2s infinite;
+            border-color: #ffffff !important;
+        }
+
+        @keyframes shake {
+            0% { transform: translateY(0); }
+            25% { transform: translateY(-3px); }
+            50% { transform: translateY(0); }
+            75% { transform: translateY(3px); }
+            100% { transform: translateY(0); }
+        }
+
+        #villain-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent);
+            margin-bottom: 15px;
+            background-color: #1a1a24;
         }
 
         #villain-name {
             margin: 0;
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 800;
         }
 
         #villain-origin {
-            margin: 10px 0 0 0;
+            margin: 5px 0 0 0;
             color: var(--text-sub);
             font-style: italic;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         button {
@@ -100,6 +125,13 @@
             transition: all 0.2s ease;
             height: 60px;
             border: 1px solid transparent;
+            overflow: hidden;
+        }
+
+        /* Disable slot interaction while the wheel is spinning */
+        .slots-locked .slot {
+            pointer-events: none;
+            opacity: 0.7;
         }
 
         .slot:hover:not(.filled) {
@@ -125,12 +157,16 @@
             align-items: center;
             justify-content: center;
             border-radius: 8px 0 0 8px;
+            flex-shrink: 0;
         }
 
         .slot-content {
-            padding-left: 20px;
-            font-size: 1.2rem;
+            padding-left: 15px;
+            font-size: 1.1rem;
             font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .hidden {
@@ -143,21 +179,27 @@
     <h1>Blind Rank</h1>
     <p class="subtitle">Top 100 Villains in Pop Culture (Movies, TV, Games)</p>
 
-    <div id="game-board">
+    <div id="game-board" class="slots-locked">
         <div id="current-villain-card">
+            <img id="villain-img" class="hidden" src="" alt="Villain Image">
             <h2 id="villain-name" class="hidden"></h2>
             <p id="villain-origin" class="hidden"></p>
             <button id="start-btn">Start Game</button>
         </div>
 
         <div id="rank-list">
-            <!-- JavaScript will populate slots 1 to 10 here -->
+            <!-- JavaScript populates slots 1 to 10 here -->
         </div>
     </div>
 
     <script>
-        // The Top 100 Villains Database
-        const villainsDatabase = [
+        // --- HOW TO ADD REAL IMAGES ---
+        // Right now, this script generates an avatar image based on the villain's name.
+        // To use real images, create an "images" folder in your GitHub repository,
+        // upload your pictures, and add the 'image' property to the villain object like this:
+        // { name: "Darth Vader", origin: "Star Wars", image: "images/vader.jpg" }
+
+        const rawVillains = [
             { name: "Darth Vader", origin: "Star Wars" },
             { name: "The Joker", origin: "DC Comics / Batman" },
             { name: "Hannibal Lecter", origin: "The Silence of the Lambs" },
@@ -260,12 +302,25 @@
             { name: "Pennywise", origin: "IT" }
         ];
 
+        // Process the database to include auto-generated placeholder images if none are provided
+        const villainsDatabase = rawVillains.map(villain => {
+            if (!villain.image) {
+                // Generates an image with the character's initials
+                const encodedName = encodeURIComponent(villain.name);
+                villain.image = `https://ui-avatars.com/api/?name=${encodedName}&background=2d2d3f&color=ff4757&size=150&bold=true`;
+            }
+            return villain;
+        });
+
         let availableVillains = [...villainsDatabase];
         let currentVillain = null;
         let slotsFilled = 0;
+        let isRolling = false;
 
         // Initialize the 10 UI slots
         const rankList = document.getElementById('rank-list');
+        const gameBoard = document.getElementById('game-board');
+        
         for (let i = 1; i <= 10; i++) {
             const slot = document.createElement('div');
             slot.className = 'slot';
@@ -283,25 +338,69 @@
             rankList.appendChild(slot);
         }
 
-        // Logic to draw a random villain
-        function rollVillain() {
-            if (slotsFilled >= 10) return; 
+        // Updates the card UI with a specific villain's data
+        function updateCardUI(villain) {
+            document.getElementById('villain-name').innerText = villain.name;
+            document.getElementById('villain-origin').innerText = villain.origin;
+            document.getElementById('villain-img').src = villain.image;
+        }
 
+        // The Rolling Animation Logic
+        function animateRoll(callback) {
+            isRolling = true;
+            gameBoard.classList.add('slots-locked');
+            document.getElementById('current-villain-card').classList.add('is-rolling');
+
+            let rollCount = 0;
+            let delay = 40; // Start fast
+
+            function rollStep() {
+                // Show a random villain for the visual effect
+                const randomTemp = availableVillains[Math.floor(Math.random() * availableVillains.length)];
+                updateCardUI(randomTemp);
+
+                rollCount++;
+
+                if (rollCount < 15) {
+                    // Keep fast speed
+                    setTimeout(rollStep, delay);
+                } else if (rollCount < 25) {
+                    // Start slowing down
+                    delay += 25;
+                    setTimeout(rollStep, delay);
+                } else {
+                    // Finish the roll
+                    document.getElementById('current-villain-card').classList.remove('is-rolling');
+                    callback(); 
+                }
+            }
+            rollStep();
+        }
+
+        // Logic to draw the final random villain
+        function drawFinalVillain() {
             const randIndex = Math.floor(Math.random() * availableVillains.length);
             currentVillain = availableVillains[randIndex];
             
-            // Remove them from the pool so we don't get duplicates
+            // Remove them from the pool
             availableVillains.splice(randIndex, 1);
             
-            document.getElementById('villain-name').innerText = currentVillain.name;
-            document.getElementById('villain-origin').innerText = currentVillain.origin;
+            // Update UI and unlock slots
+            updateCardUI(currentVillain);
+            isRolling = false;
+            gameBoard.classList.remove('slots-locked');
+        }
+
+        function triggerNewVillain() {
+            if (slotsFilled >= 10) return; 
+            animateRoll(drawFinalVillain);
         }
 
         // Handle clicking on a slot
         document.querySelectorAll('.slot').forEach(slot => {
             slot.addEventListener('click', () => {
-                if (!currentVillain) return; // Ignore if no villain is rolled
-                if (slot.classList.contains('filled')) return; // Ignore if slot is taken
+                if (isRolling || !currentVillain) return; // Prevent clicking during animation
+                if (slot.classList.contains('filled')) return; // Ignore filled slots
                 
                 // Set the slot text
                 slot.querySelector('.slot-content').innerText = `${currentVillain.name} - (${currentVillain.origin})`;
@@ -311,11 +410,12 @@
                 slotsFilled++;
                 
                 if (slotsFilled < 10) {
-                    rollVillain();
+                    triggerNewVillain();
                 } else {
                     // Game Over state
+                    document.getElementById('villain-img').classList.add('hidden');
                     document.getElementById('villain-name').innerText = "List Complete!";
-                    document.getElementById('villain-origin').innerText = "Here is your final blind ranking.";
+                    document.getElementById('villain-origin').innerText = "Screenshot to share your blind ranking.";
                 }
             });
         });
@@ -323,9 +423,10 @@
         // Start button logic
         document.getElementById('start-btn').addEventListener('click', (e) => {
             e.target.classList.add('hidden');
+            document.getElementById('villain-img').classList.remove('hidden');
             document.getElementById('villain-name').classList.remove('hidden');
             document.getElementById('villain-origin').classList.remove('hidden');
-            rollVillain();
+            triggerNewVillain();
         });
     </script>
 </body>
