@@ -9,7 +9,7 @@ h1{color:var(--ac);text-transform:uppercase;letter-spacing:2px;text-align:center
 #current-villain-card{text-align:center;margin-bottom:15px;width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center}
 .is-rolling{animation:shake .2s infinite}.is-rolling #villain-img{border-color:#fff!important}
 @keyframes shake{0%,100%{transform:translateY(0)}25%{transform:translateY(-3px)}75%{transform:translateY(3px)}}
-#villain-img{width:400px;height:400px;max-width:100%;border-radius:12px;object-fit:cover;object-position:center top;border:3px solid var(--ac);margin-bottom:5px;background:var(--bg);box-shadow:0 8px 20px rgba(255,71,87,.2)}
+#villain-img{width:400px;height:400px;max-width:100%;border-radius:12px;object-fit:contain;border:3px solid var(--ac);margin-bottom:5px;background:var(--bg);box-shadow:0 8px 20px rgba(255,71,87,.2)}
 #villain-name{margin:0;font-size:1.8rem;font-weight:800}#villain-origin{margin:2px 0 15px;color:var(--ts);font-style:italic;font-size:1rem}
 button{background:var(--ac);color:#fff;border:none;padding:12px 30px;font-size:1.2rem;font-weight:700;border-radius:8px;cursor:pointer;transition:all .2s;text-transform:uppercase}
 button:hover{background:var(--ach);transform:scale(1.05)}
@@ -58,7 +58,7 @@ updateCardUI(currentVillain);isRolling=!1,gameBoard.classList.remove("slots-lock
 function triggerNewVillain(){slotsFilled>=10||(currentVillain=null,animateRoll(drawFinalVillain))}
 document.querySelectorAll(".slot").forEach((e=>{e.addEventListener("click",(()=>{if(isRolling||!currentVillain||e.classList.contains("filled"))return;
 e.querySelector(".slot-content").innerText=`${currentVillain.name} (${currentVillain.origin})`,e.classList.add("filled");
-slotsFilled++,slotsFilled<10?triggerNewVillain():(villainImg.classList.add("hidden"),document.getElementById("villain-name").innerText="List Complete!",document.getElementById("villain-origin").innerText="Screenshot to share.")}))}));
+slotsFilled++,slotsFilled<10?triggerNewVillain():(villainImg.classList.add("hidden"),document.getElementById("villain-name").innerText="List Complete!",document.getElementById("villain-origin").innerText="")}))}));
 document.getElementById("start-btn").addEventListener("click",(e=>{e.target.classList.add("hidden"),villainImg.classList.remove("hidden");
 document.getElementById("villain-name").classList.remove("hidden"),document.getElementById("villain-origin").classList.remove("hidden");triggerNewVillain()}));
 </script></body></html>
