@@ -58,7 +58,7 @@ updateCardUI(currentVillain);isRolling=!1,gameBoard.classList.remove("slots-lock
 function triggerNewVillain(){slotsFilled>=10||(currentVillain=null,animateRoll(drawFinalVillain))}
 document.querySelectorAll(".slot").forEach((e=>{e.addEventListener("click",(()=>{if(isRolling||!currentVillain||e.classList.contains("filled"))return;
 e.querySelector(".slot-content").innerText=`${currentVillain.name} (${currentVillain.origin})`,e.classList.add("filled");
-slotsFilled++,slotsFilled<10?triggerNewVillain():(villainImg.classList.add("hidden"),document.getElementById("villain-name").innerText="List Complete!"
+slotsFilled++,slotsFilled<10?triggerNewVillain():(villainImg.classList.add("hidden"),document.getElementById("villain-name").innerText="List Complete!",document.getElementById("villain-origin").innerText="Screenshot to share.")}))}));
 document.getElementById("start-btn").addEventListener("click",(e=>{e.target.classList.add("hidden"),villainImg.classList.remove("hidden");
 document.getElementById("villain-name").classList.remove("hidden"),document.getElementById("villain-origin").classList.remove("hidden");triggerNewVillain()}));
 </script></body></html>
