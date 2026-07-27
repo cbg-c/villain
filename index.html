@@ -26,7 +26,7 @@ button:hover{background:var(--ach);transform:scale(1.05)}
 <div id="game-board" class="slots-locked"><div id="roller">
 <img id="villain-img" class="hidden" src="" alt="Villain" onerror="usePlaceholder(this)">
 <div id="current-villain-card"><h2 id="villain-name" class="hidden"></h2><p id="villain-origin" class="hidden"></p>
-<button id="start-btn">Start Game</button></div></div><div id="rank-list"></div></div>
+<button id="start-btn">Start Game</button><button id="restart-btn" class="hidden">Start Over</button></div></div><div id="rank-list"></div></div>
 <script>
 const rawVillains=[
 {name:"Cassius",origin:"Red Rising",image:"images/cassius.jpg"},{name:"Reyna",origin:"Valorant",image:"images/reyna.jpg"},{name:"Darth Vader",origin:"Star Wars",image:"images/darth_vader.jpg"},
@@ -58,7 +58,11 @@ updateCardUI(currentVillain);isRolling=!1,gameBoard.classList.remove("slots-lock
 function triggerNewVillain(){slotsFilled>=10||(currentVillain=null,animateRoll(drawFinalVillain))}
 document.querySelectorAll(".slot").forEach((e=>{e.addEventListener("click",(()=>{if(isRolling||!currentVillain||e.classList.contains("filled"))return;
 e.querySelector(".slot-content").innerText=`${currentVillain.name} (${currentVillain.origin})`,e.classList.add("filled");
-slotsFilled++,slotsFilled<10?triggerNewVillain():(villainImg.classList.add("hidden"),document.getElementById("villain-name").innerText="List Complete!",document.getElementById("villain-origin").innerText="")}))}));
+slotsFilled++,slotsFilled<10?triggerNewVillain():(villainImg.classList.add("hidden"),document.getElementById("villain-name").innerText="List Complete!",
+document.getElementById("villain-origin").innerText="",document.getElementById("restart-btn").classList.remove("hidden"))}))}));
 document.getElementById("start-btn").addEventListener("click",(e=>{e.target.classList.add("hidden"),villainImg.classList.remove("hidden");
 document.getElementById("villain-name").classList.remove("hidden"),document.getElementById("villain-origin").classList.remove("hidden");triggerNewVillain()}));
+document.getElementById("restart-btn").addEventListener("click",(e=>{e.target.classList.add("hidden"),villainImg.classList.remove("hidden");
+slotsFilled=0,availableVillains=[...rawVillains];document.querySelectorAll(".slot").forEach(s=>{s.classList.remove("filled"),s.querySelector(".slot-content").innerText=""});
+triggerNewVillain()}));
 </script></body></html>
