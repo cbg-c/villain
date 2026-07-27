@@ -181,7 +181,7 @@
 
     <div id="game-board" class="slots-locked">
         <div id="current-villain-card">
-            <img id="villain-img" class="hidden" src="" alt="Villain Image">
+            <img id="villain-img" class="hidden" src="" alt="Villain Image" onerror="this.onerror=null; usePlaceholder(this);">
             <h2 id="villain-name" class="hidden"></h2>
             <p id="villain-origin" class="hidden"></p>
             <button id="start-btn">Start Game</button>
@@ -193,134 +193,74 @@
     </div>
 
     <script>
-        // --- HOW TO ADD REAL IMAGES ---
-        // Right now, this script generates an avatar image based on the villain's name.
-        // To use real images, create an "images" folder in your GitHub repository,
-        // upload your pictures, and add the 'image' property to the villain object like this:
-        // { name: "Darth Vader", origin: "Star Wars", image: "images/vader.jpg" }
+        // --- HOW TO ADD IMAGES ---
+        // 1. Create a folder named 'images' in the same folder as this index.html file.
+        // 2. Place JPG images inside that folder.
+        // 3. Ensure the filenames match exactly what is listed below (e.g., darth_vader.jpg).
 
         const rawVillains = [
-            { name: "Darth Vader", origin: "Star Wars" },
-            { name: "The Joker", origin: "DC Comics / Batman" },
-            { name: "Hannibal Lecter", origin: "The Silence of the Lambs" },
-            { name: "Lord Voldemort", origin: "Harry Potter" },
-            { name: "Sauron", origin: "The Lord of the Rings" },
-            { name: "Norman Bates", origin: "Psycho" },
-            { name: "Hans Gruber", origin: "Die Hard" },
-            { name: "Anton Chigurh", origin: "No Country for Old Men" },
-            { name: "Thanos", origin: "Marvel Cinematic Universe" },
-            { name: "Emperor Palpatine", origin: "Star Wars" },
-            { name: "Magneto", origin: "X-Men" },
-            { name: "Lex Luthor", origin: "Superman" },
-            { name: "Nurse Ratched", origin: "One Flew Over the Cuckoo's Nest" },
-            { name: "HAL 9000", origin: "2001: A Space Odyssey" },
-            { name: "Wicked Witch of the West", origin: "The Wizard of Oz" },
-            { name: "Michael Myers", origin: "Halloween" },
-            { name: "Freddy Krueger", origin: "A Nightmare on Elm Street" },
-            { name: "Jason Voorhees", origin: "Friday the 13th" },
-            { name: "T-800 Terminator", origin: "The Terminator" },
-            { name: "T-1000", origin: "Terminator 2: Judgment Day" },
-            { name: "Agent Smith", origin: "The Matrix" },
-            { name: "Gollum", origin: "The Lord of the Rings" },
-            { name: "Amon Goeth", origin: "Schindler's List" },
-            { name: "Scar", origin: "The Lion King" },
-            { name: "Cruella de Vil", origin: "101 Dalmatians" },
-            { name: "Joffrey Baratheon", origin: "Game of Thrones" },
-            { name: "Ramsay Bolton", origin: "Game of Thrones" },
-            { name: "Cersei Lannister", origin: "Game of Thrones" },
-            { name: "Tywin Lannister", origin: "Game of Thrones" },
-            { name: "Night King", origin: "Game of Thrones" },
-            { name: "Homelander", origin: "The Boys" },
-            { name: "Gus Fring", origin: "Breaking Bad" },
-            { name: "Walter White", origin: "Breaking Bad" },
-            { name: "Negan", origin: "The Walking Dead" },
-            { name: "Sephiroth", origin: "Final Fantasy VII" },
-            { name: "Bowser", origin: "Super Mario Bros." },
-            { name: "Ganondorf", origin: "The Legend of Zelda" },
-            { name: "Albert Wesker", origin: "Resident Evil" },
-            { name: "GLaDOS", origin: "Portal" },
-            { name: "Handsome Jack", origin: "Borderlands 2" },
-            { name: "Dr. Eggman / Robotnik", origin: "Sonic the Hedgehog" },
-            { name: "Dracula", origin: "Castlevania / Universal" },
-            { name: "Shao Kahn", origin: "Mortal Kombat" },
-            { name: "M. Bison", origin: "Street Fighter" },
-            { name: "The Lich King (Arthas)", origin: "World of Warcraft" },
-            { name: "Vaas Montenegro", origin: "Far Cry 3" },
-            { name: "Dutch van der Linde", origin: "Red Dead Redemption 2" },
-            { name: "Andrew Ryan", origin: "BioShock" },
-            { name: "Frank Fontaine", origin: "BioShock" },
-            { name: "Alma Wade", origin: "F.E.A.R." },
-            { name: "Nemesis", origin: "Resident Evil 3" },
-            { name: "Pyramid Head", origin: "Silent Hill 2" },
-            { name: "Ridley", origin: "Metroid" },
-            { name: "King K. Rool", origin: "Donkey Kong Country" },
-            { name: "Micah Bell", origin: "Red Dead Redemption 2" },
-            { name: "Liquid Snake", origin: "Metal Gear Solid" },
-            { name: "Revolver Ocelot", origin: "Metal Gear Solid" },
-            { name: "Master Hand", origin: "Super Smash Bros." },
-            { name: "The Illusive Man", origin: "Mass Effect" },
-            { name: "Saren Arterius", origin: "Mass Effect" },
-            { name: "SHODAN", origin: "System Shock" },
-            { name: "Eredin", origin: "The Witcher 3: Wild Hunt" },
-            { name: "Gaunter O'Dimm", origin: "The Witcher 3: Hearts of Stone" },
-            { name: "Maleficent", origin: "Sleeping Beauty" },
-            { name: "Ursula", origin: "The Little Mermaid" },
-            { name: "Jafar", origin: "Aladdin" },
-            { name: "Hades", origin: "Hercules" },
-            { name: "Gaston", origin: "Beauty and the Beast" },
-            { name: "Claude Frollo", origin: "The Hunchback of Notre Dame" },
-            { name: "Captain Hook", origin: "Peter Pan" },
-            { name: "The Evil Queen", origin: "Snow White" },
-            { name: "Yzma", origin: "The Emperor's New Groove" },
-            { name: "Bellatrix Lestrange", origin: "Harry Potter" },
-            { name: "Dolores Umbridge", origin: "Harry Potter" },
-            { name: "Kylo Ren", origin: "Star Wars" },
-            { name: "General Grievous", origin: "Star Wars" },
-            { name: "Count Dooku", origin: "Star Wars" },
-            { name: "Boba Fett", origin: "Star Wars" },
-            { name: "Green Goblin", origin: "Spider-Man" },
-            { name: "Doctor Octopus", origin: "Spider-Man" },
-            { name: "Venom", origin: "Spider-Man" },
-            { name: "Loki", origin: "Marvel Cinematic Universe" },
-            { name: "Killmonger", origin: "Black Panther" },
-            { name: "Hela", origin: "Thor: Ragnarok" },
-            { name: "Ultron", origin: "Avengers: Age of Ultron" },
-            { name: "Red Skull", origin: "Captain America" },
-            { name: "Kingpin", origin: "Daredevil" },
-            { name: "Bane", origin: "Batman" },
-            { name: "Ra's al Ghul", origin: "Batman" },
-            { name: "Scarecrow", origin: "Batman" },
-            { name: "Two-Face", origin: "Batman" },
-            { name: "The Riddler", origin: "Batman" },
-            { name: "The Penguin", origin: "Batman" },
-            { name: "Harley Quinn", origin: "DC Comics" },
-            { name: "Darkseid", origin: "DC Comics" },
-            { name: "Reverse-Flash", origin: "The Flash" },
-            { name: "Deathstroke", origin: "DC Comics" },
-            { name: "General Zod", origin: "Superman" },
-            { name: "Omni-Man", origin: "Invincible" },
-            { name: "Pennywise", origin: "IT" }
+            { name: "Darth Vader", origin: "Star Wars", image: "images/darth_vader.jpg" },
+            { name: "The Joker", origin: "DC Comics / Batman", image: "images/joker.jpg" },
+            { name: "Hannibal Lecter", origin: "The Silence of the Lambs", image: "images/hannibal_lecter.jpg" },
+            { name: "Lord Voldemort", origin: "Harry Potter", image: "images/voldemort.jpg" },
+            { name: "Sauron", origin: "The Lord of the Rings", image: "images/sauron.jpg" },
+            { name: "Norman Bates", origin: "Psycho", image: "images/norman_bates.jpg" },
+            { name: "Anton Chigurh", origin: "No Country for Old Men", image: "images/anton_chigurh.jpg" },
+            { name: "Thanos", origin: "Marvel Cinematic Universe", image: "images/thanos.jpg" },
+            { name: "Emperor Palpatine", origin: "Star Wars", image: "images/palpatine.jpg" },
+            { name: "Magneto", origin: "X-Men", image: "images/magneto.jpg" },
+            { name: "Lex Luthor", origin: "Superman", image: "images/lex_luthor.jpg" },
+            { name: "Wicked Witch of the West", origin: "The Wizard of Oz", image: "images/wicked_witch.jpg" },
+            { name: "Michael Myers", origin: "Halloween", image: "images/michael_myers.jpg" },
+            { name: "Freddy Krueger", origin: "A Nightmare on Elm Street", image: "images/freddy_krueger.jpg" },
+            { name: "Jason Voorhees", origin: "Friday the 13th", image: "images/jason_voorhees.jpg" },
+            { name: "T-800 Terminator", origin: "The Terminator", image: "images/t800.jpg" },
+            { name: "Gollum", origin: "The Lord of the Rings", image: "images/gollum.jpg" },
+            { name: "Scar", origin: "The Lion King", image: "images/scar.jpg" },
+            { name: "Joffrey Baratheon", origin: "Game of Thrones", image: "images/joffrey_baratheon.jpg" },
+            { name: "Night King", origin: "Game of Thrones", image: "images/night_king.jpg" },
+            { name: "Homelander", origin: "The Boys", image: "images/homelander.jpg" },
+            { name: "Gus Fring", origin: "Breaking Bad", image: "images/gus_fring.jpg" },
+            { name: "Negan", origin: "The Walking Dead", image: "images/negan.jpg" },
+            { name: "Bowser", origin: "Super Mario Bros.", image: "images/bowser.jpg" },
+            { name: "Ganondorf", origin: "The Legend of Zelda", image: "images/ganondorf.jpg" },
+            { name: "Albert Wesker", origin: "Resident Evil", image: "images/albert_wesker.jpg" },
+            { name: "Dracula", origin: "Castlevania / Universal", image: "images/dracula.jpg" },
+            { name: "The Lich King (Arthas)", origin: "World of Warcraft", image: "images/lich_king.jpg" },
+            { name: "Nemesis", origin: "Resident Evil 3", image: "images/nemesis.jpg" },
+            { name: "Pyramid Head", origin: "Silent Hill 2", image: "images/pyramid_head.jpg" },
+            { name: "Ridley", origin: "Metroid", image: "images/ridley.jpg" },
+            { name: "Maleficent", origin: "Sleeping Beauty", image: "images/maleficent.jpg" },
+            { name: "Ursula", origin: "The Little Mermaid", image: "images/ursula.jpg" },
+            { name: "Jafar", origin: "Aladdin", image: "images/jafar.jpg" },
+            { name: "Gaston", origin: "Beauty and the Beast", image: "images/gaston.jpg" },
+            { name: "Yzma", origin: "The Emperor's New Groove", image: "images/yzma.jpg" },
+            { name: "Kylo Ren", origin: "Star Wars", image: "images/kylo_ren.jpg" },
+            { name: "General Grievous", origin: "Star Wars", image: "images/general_grievous.jpg" },
+            { name: "Green Goblin", origin: "Spider-Man", image: "images/green_goblin.jpg" },
+            { name: "Doctor Octopus", origin: "Spider-Man", image: "images/doctor_octopus.jpg" },
+            { name: "Venom", origin: "Spider-Man", image: "images/venom.jpg" },
+            { name: "Loki", origin: "Marvel Cinematic Universe", image: "images/loki.jpg" },
+            { name: "Hela", origin: "Thor: Ragnarok", image: "images/hela.jpg" },
+            { name: "Ultron", origin: "Avengers: Age of Ultron", image: "images/ultron.jpg" },
+            { name: "Bane", origin: "Batman", image: "images/bane.jpg" },
+            { name: "Pennywise", origin: "IT", image: "images/pennywise.jpg" }
         ];
 
-        // Process the database to include auto-generated placeholder images if none are provided
-        const villainsDatabase = rawVillains.map(villain => {
-            if (!villain.image) {
-                // Generates an image with the character's initials
-                const encodedName = encodeURIComponent(villain.name);
-                villain.image = `https://ui-avatars.com/api/?name=${encodedName}&background=2d2d3f&color=ff4757&size=150&bold=true`;
-            }
-            return villain;
-        });
+        // Process the database (fallback mechanism happens live via onerror)
+        const villainsDatabase = [...rawVillains];
 
         let availableVillains = [...villainsDatabase];
         let currentVillain = null;
         let slotsFilled = 0;
         let isRolling = false;
 
-        // Initialize the 10 UI slots
+        // Initialize UI elements
         const rankList = document.getElementById('rank-list');
         const gameBoard = document.getElementById('game-board');
+        const villainImg = document.getElementById('villain-img');
         
+        // Populate the 10 ranking slots
         for (let i = 1; i <= 10; i++) {
             const slot = document.createElement('div');
             slot.className = 'slot';
@@ -338,11 +278,24 @@
             rankList.appendChild(slot);
         }
 
+        // Fallback function if local image isn't found
+        function usePlaceholder(imgElement) {
+            if (!currentVillain && !isRolling) return; 
+            
+            // Note: During rapid animation, currentVillain isn't always set yet, 
+            // but the src update triggers onerror. This live fallback handles it.
+            // When not animating, we use currentVillain name, otherwise a general placeholder.
+            const nameToEncode = currentVillain ? currentVillain.name : "V";
+            const encodedName = encodeURIComponent(nameToEncode);
+            imgElement.src = `https://ui-avatars.com/api/?name=${encodedName}&background=2d2d3f&color=ff4757&size=150&bold=true`;
+        }
+
         // Updates the card UI with a specific villain's data
         function updateCardUI(villain) {
             document.getElementById('villain-name').innerText = villain.name;
             document.getElementById('villain-origin').innerText = villain.origin;
-            document.getElementById('villain-img').src = villain.image;
+            // Set source - if file doesn't exist, HTML onerror attribute calls usePlaceholder()
+            villainImg.src = villain.image;
         }
 
         // The Rolling Animation Logic
@@ -352,24 +305,24 @@
             document.getElementById('current-villain-card').classList.add('is-rolling');
 
             let rollCount = 0;
-            let delay = 40; // Start fast
+            let delay = 40; // Start speed
 
             function rollStep() {
-                // Show a random villain for the visual effect
-                const randomTemp = availableVillains[Math.floor(Math.random() * availableVillains.length)];
+                // Show a random temporary villain from the original database for visual effect
+                const randomTemp = villainsDatabase[Math.floor(Math.random() * villainsDatabase.length)];
                 updateCardUI(randomTemp);
 
                 rollCount++;
 
                 if (rollCount < 15) {
-                    // Keep fast speed
+                    // Constant fast speed
                     setTimeout(rollStep, delay);
                 } else if (rollCount < 25) {
-                    // Start slowing down
+                    // Slowing down
                     delay += 25;
                     setTimeout(rollStep, delay);
                 } else {
-                    // Finish the roll
+                    // Finish animation
                     document.getElementById('current-villain-card').classList.remove('is-rolling');
                     callback(); 
                 }
@@ -377,15 +330,15 @@
             rollStep();
         }
 
-        // Logic to draw the final random villain
+        // Logic to draw the actual random villain
         function drawFinalVillain() {
             const randIndex = Math.floor(Math.random() * availableVillains.length);
             currentVillain = availableVillains[randIndex];
             
-            // Remove them from the pool
+            // Remove them from the pool for this session
             availableVillains.splice(randIndex, 1);
             
-            // Update UI and unlock slots
+            // Set UI to final villain and unlock slots
             updateCardUI(currentVillain);
             isRolling = false;
             gameBoard.classList.remove('slots-locked');
@@ -393,37 +346,37 @@
 
         function triggerNewVillain() {
             if (slotsFilled >= 10) return; 
+            currentVillain = null; // Clear previous selection before animation starts
             animateRoll(drawFinalVillain);
         }
 
         // Handle clicking on a slot
         document.querySelectorAll('.slot').forEach(slot => {
             slot.addEventListener('click', () => {
-                if (isRolling || !currentVillain) return; // Prevent clicking during animation
-                if (slot.classList.contains('filled')) return; // Ignore filled slots
+                if (isRolling || !currentVillain) return; // Prevent interaction during spin
+                if (slot.classList.contains('filled')) return; // Slot already taken
                 
-                // Set the slot text
-                slot.querySelector('.slot-content').innerText = `${currentVillain.name} - (${currentVillain.origin})`;
+                // Add text and mark slot as filled
+                slot.querySelector('.slot-content').innerText = `${currentVillain.name} (${currentVillain.origin})`;
                 slot.classList.add('filled');
                 
-                currentVillain = null;
                 slotsFilled++;
                 
                 if (slotsFilled < 10) {
                     triggerNewVillain();
                 } else {
-                    // Game Over state
-                    document.getElementById('villain-img').classList.add('hidden');
+                    // List is complete
+                    villainImg.classList.add('hidden');
                     document.getElementById('villain-name').innerText = "List Complete!";
                     document.getElementById('villain-origin').innerText = "Screenshot to share your blind ranking.";
                 }
             });
         });
 
-        // Start button logic
+        // Start button initialization
         document.getElementById('start-btn').addEventListener('click', (e) => {
             e.target.classList.add('hidden');
-            document.getElementById('villain-img').classList.remove('hidden');
+            villainImg.classList.remove('hidden');
             document.getElementById('villain-name').classList.remove('hidden');
             document.getElementById('villain-origin').classList.remove('hidden');
             triggerNewVillain();
